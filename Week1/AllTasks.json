@@ -1,0 +1,14 @@
+[
+    {
+        "title": "Go to school",
+        "description": "Go to school by 10am",
+        "due_date": "2026-01-26",
+        "completed": false
+    },
+    {
+        "title": "Assignment",
+        "description": "Finish 3 courses assignment",
+        "due_date": "2026-02-01",
+        "completed": false
+    }
+]
