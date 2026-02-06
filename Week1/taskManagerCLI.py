@@ -2,104 +2,119 @@ import json
 import os
 from datetime import datetime
 
-FILE_NAME = "AllTasks.json"
+# Check if tasks.json exists or if its not empty if existing
+if os.path.exists("tasks.json") and os.path.getsize("tasks.json") > 0: 
+    with open("tasks.json", "r") as f:
+        tasks = json.load(f)
+        # if it exists and not empty load the objects there to json
+else:
+    tasks = []
+    # put an empty list there if empty or non existent
 
-def loadTasks():
-    if not os.path.exists(FILE_NAME):
-        return []
-    with open(FILE_NAME, "r") as file:
-        return json.load(file)
-
-def saveTasks(tasks):
-    with open(FILE_NAME, "w") as file:
+def save_tasks(tasks):
+    with open("tasks.json", "w") as file:
         json.dump(tasks, file, indent=4)
 
-def addTask(tasks):
-    title = input("Task title: ")
-    desc = input("Task description: ")
-    dueDate = input("Due date (YYYY-MM-DD): ")
-    try:
-        datetime.strptime(dueDate, "%Y-%m-%d")
-    except ValueError:
-        print("This is not a valid date format")
-        return
+def view_tasks():
+    read_tasks = open("tasks.json", "r")
+    print(read_tasks.read())
 
-    task = {
-        "title": title,
-        "description": desc,
-        "due_date": dueDate,
-        "completed": False
-    }
-    tasks.append(task)
-    saveTasks(tasks)
-    print("Task added successfully!")
-
-def viewTasks(tasks):
-    if not tasks:
-        print("No task has been created")
-        return
-
-    print("\nALL TASKS")
-    for task in tasks:
-        status = "Completed" if task["completed"] else "Not Completed"
-        print(f"""
-Title: {task['title']}
-Description: {task['description']}
-Due Date: {task['due_date']}
-Status: {status}
-""")
-
-def markComplete(tasks):
-    taskTitle = input("Which task have you completed: ")
-
-    for task in tasks:
-        if task["title"].lower() == taskTitle.lower():
-            task["completed"] = True
-            saveTasks(tasks)
-            print("Task has been completed!")
-            return
-
-    print("No task with that name")
-
-def deleteTask(tasks):
-    taskTitle = input("Which task do you want to delete: ")
-
-    for task in tasks:
-        if task["title"].lower() == taskTitle.lower():
-            tasks.remove(task)
-            saveTasks(tasks)
-            print("Task deleted.")
-            return
-
-    print("No task with that name")
-
-def main():
-    tasks = loadTasks()
-    viewTasks(tasks)
+def add_tasks():
+    while True:
+        #strip removes trailing white spaces before and after
+        name = input("Task Name: ").strip()
+        if name:
+            break
+        print("Enter a Task name:")
 
     while True:
-        print("""
-TASK MANAGER
-1. Add task
-2. View all tasks
-3. Mark task as complete
-4. Delete task
-5. Stop Process
-""")
-        num = input("Choose an option to continue: ")
+        description = input("Task Description: ").strip()
+        if description:
+            break
+        print("Enter a Description:")
+    
+    while True:
+        date = input("Task Due Date(DD/MM/YY): ").strip()
+        try:
+            due_date = datetime.strptime(date, "%d-%m-%y")
+            break
+        except(ValueError):
+            print("Invalid Date Format, use dd-mm-yy")
 
-        if num == "1":
-            addTask(tasks)
-        elif num == "2":
-            viewTasks(tasks)
-        elif num == "3":
-            markComplete(tasks)
-        elif num == "4":
-            deleteTask(tasks)
-        elif num == "5":
+    task_id = len(tasks) + 1
+ 
+    task = {
+        "id": task_id,
+        "name": name,
+        "description": description,
+        "due date": date,
+        "status": "pending"
+    }
+    tasks.append(task)
+    save_tasks(tasks)
+
+def mark_as_complete(id):
+    id = int(input("Enter Task Id: "))
+    for task in tasks:
+        if (task["id"]) == id:
+            if task["status"] == "completed":
+                return("Task has been completed already")
+            else:           
+                task["status"] = "completed"
+                save_tasks(tasks)
+                return("Task successfully marked as completed")
+    return("Invalid Task Id")
+
+def view_all_pending():
+    for task in tasks:
+        if task["status"] != "completed":
+            task_json = json.dumps(task, indent=4)
+            print(task_json)
+
+def view_all_completed():
+    for task in tasks:
+        if task["status"] == "completed":
+            task_json = json.dumps(task, indent=4)
+            print(task_json)
+
+def delete_task(id):
+    id = int(input("Enter Task Id: "))
+    for task in tasks:
+        if (task["id"]) == id:
+            tasks.remove(task)
+            save_tasks(tasks)
+            return("Task has been sucessfully deleted")
+    
+    return("Invalid Task Id")
+
+def task_manager_cli():
+    while True:
+        print("""
+TASK MANAGER ACTIONS
+1. Add New Task
+2. View All Tasks
+3. Mark Task as Complete
+4. Delete Task
+5. View All Pending Tasks
+6. View All Completed Tasks
+7. Stop Process
+""")
+        task_action = int(input("Enter a Number: "))
+        if task_action == 1:
+            add_tasks()
+        elif task_action == 2:
+            view_tasks()
+        elif task_action == 3:
+            print(mark_as_complete(id))
+        elif task_action == 4:
+            print(delete_task(id))
+        elif task_action == 5:
+            print(view_all_pending())
+        elif task_action == 6:
+            print(view_all_completed())
+        elif task_action == 7:
             break
         else:
-            print("Choose a number from 1 to 5")
+            print("Select a number from 1 to 5")
 
-if __name__ == "__main__":
-    main()
+print(task_manager_cli())
