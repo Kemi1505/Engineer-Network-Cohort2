@@ -1,0 +1,10 @@
+# Libraries required
+Flask
+Flask-SQLAlchemy
+Flask-Bcrypt
+Flask-CORS
+Flask-Limiter
+PyJWT
+python-dotenv
+marshmallow
+marshmallow-sqlalchemy
